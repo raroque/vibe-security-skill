@@ -6,17 +6,17 @@
     </a>
 </p>
 
-<h1 align="center">Vibe Security — Agent Skill for AI Coding Assistants</h1>
+<h1 align="center">Vibe Security - Agent Skill for AI Coding Assistants</h1>
 
-An agent skill that helps secure vibe-coded apps — or honestly any app — from common security vulnerability patterns. Built by [Chris Raroque](https://www.youtube.com/@raroque) ([@raroque](https://twitter.com/raroque)) in collaboration with the developers at [Aloa](https://aloa.co).
+An agent skill that helps secure vibe-coded apps - or honestly any app - from common security vulnerability patterns. Built by [Chris Raroque](https://www.youtube.com/@raroque) ([@raroque](https://twitter.com/raroque)) in collaboration with my colleagues at [Aloa](https://aloa.co).
 
-AI assistants are great at building features fast but consistently get security wrong — hardcoding secrets, skipping row-level security, trusting client-submitted prices, storing tokens in localStorage. This skill catches those patterns before they ship.
+AI assistants are great at building features fast but consistently get security wrong: hardcoding secrets, skipping row-level security, trusting client-submitted prices, storing tokens in localStorage. This skill catches those patterns before they ship.
 
-**Need help building AI apps, custom agents, or implementing AI at your company?** Work with Chris and the team at [Aloa](https://aloa.co) — consulting and development for AI-powered products.
+**Need help building AI apps, custom agents, or implementing AI at your company?** Work with Chris and the team at [Aloa](https://aloa.co).
 
 ## Background
 
-This skill was built specifically to address the security issues that keep showing up in vibe-coded applications. When you're building fast with AI, security fundamentals get skipped — and the AI assistants themselves are often the ones introducing the vulnerabilities. This skill gives your agent the knowledge to catch and prevent those patterns.
+This skill was built specifically to address the security issues that keep showing up in vibe-coded applications. When you're building fast with AI, security fundamentals get skipped - and the AI assistants themselves are often the ones introducing the vulnerabilities. This skill gives your agent the knowledge to catch and prevent those patterns.
 
 It uses the [Agent Skills](https://agentskills.io/home) format, so it works with Claude Code, OpenAI Codex, and other compatible agents.
 
@@ -54,9 +54,9 @@ cp -r vibe-security/ ~/.claude/skills/vibe-security/
 
 ## Using Vibe Security
 
-**Claude Code:** Use `/vibe-security` to trigger a full security audit, or just ask naturally — "check my code for security issues", "is this safe?", "audit this project".
+**Claude Code:** Use `/vibe-security` to trigger a full security audit, or just ask naturally - "check my code for security issues", "is this safe?", "audit this project".
 
-**Codex:** Use `$vibe-security` or describe what you need — "review this for vulnerabilities", "check my Supabase RLS".
+**Codex:** Use `$vibe-security` or describe what you need - "review this for vulnerabilities", "check my Supabase RLS".
 
 The skill also activates automatically when you're writing or reviewing code that handles authentication, payments, database access, API keys, or user data.
 
