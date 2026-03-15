@@ -1,20 +1,22 @@
 <p align="center">
     <img src="https://img.shields.io/badge/security-vibe--coded%20apps-DC2626.svg" alt="Security for vibe-coded apps" />
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT License" />
-    <a href="https://twitter.com/caboroque">
-        <img src="https://img.shields.io/badge/Contact-@caboroque-95a5a6.svg?style=flat" alt="Twitter: @caboroque" />
+    <a href="https://twitter.com/raroque">
+        <img src="https://img.shields.io/badge/Contact-@raroque-95a5a6.svg?style=flat" alt="Twitter: @raroque" />
     </a>
 </p>
 
 <h1 align="center">Vibe Security — Agent Skill for AI Coding Assistants</h1>
 
-An agent skill that audits vibe-coded applications for the security vulnerabilities that AI coding assistants consistently introduce. Covers exposed API keys, broken access control (Supabase RLS, Firebase rules), missing auth validation, insecure payment flows, client-side trust issues, and more.
+An agent skill that helps secure vibe-coded apps — or honestly any app — from common security vulnerability patterns. Built by [Chris Raroque](https://www.youtube.com/@raroque) ([@raroque](https://twitter.com/raroque)).
 
 AI assistants are great at building features fast but consistently get security wrong — hardcoding secrets, skipping row-level security, trusting client-submitted prices, storing tokens in localStorage. This skill catches those patterns before they ship.
 
 ## Background
 
-This skill was built from real-world research into the security patterns that AI coding assistants get wrong. It uses the [Agent Skills](https://agentskills.io/home) format, so it works with Claude Code, OpenAI Codex, and other compatible agents.
+This skill was built specifically to address the security issues that keep showing up in vibe-coded applications. When you're building fast with AI, security fundamentals get skipped — and the AI assistants themselves are often the ones introducing the vulnerabilities. This skill gives your agent the knowledge to catch and prevent those patterns.
+
+It uses the [Agent Skills](https://agentskills.io/home) format, so it works with Claude Code, OpenAI Codex, and other compatible agents.
 
 The security rules are organized as reference files that the agent loads based on what technologies your project uses. If you're using Supabase, it checks RLS policies. If you're using Stripe, it checks payment flows. If you're using React Native, it checks for secrets in the JS bundle. No wasted context on irrelevant checks.
 
@@ -79,3 +81,5 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 ## License
 
 Vibe Security is available under the MIT License. See [LICENSE](LICENSE) for details.
+
+Created by [Chris Raroque](https://www.youtube.com/@raroque) ([@raroque](https://twitter.com/raroque)).
