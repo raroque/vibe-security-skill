@@ -8,9 +8,11 @@
 
 <h1 align="center">Vibe Security — Agent Skill for AI Coding Assistants</h1>
 
-An agent skill that helps secure vibe-coded apps — or honestly any app — from common security vulnerability patterns. Built by [Chris Raroque](https://www.youtube.com/@raroque) ([@raroque](https://twitter.com/raroque)).
+An agent skill that helps secure vibe-coded apps — or honestly any app — from common security vulnerability patterns. Built by [Chris Raroque](https://www.youtube.com/@raroque) ([@raroque](https://twitter.com/raroque)) in collaboration with the developers at [Aloa](https://aloa.co).
 
 AI assistants are great at building features fast but consistently get security wrong — hardcoding secrets, skipping row-level security, trusting client-submitted prices, storing tokens in localStorage. This skill catches those patterns before they ship.
+
+**Need help building AI apps, custom agents, or implementing AI at your company?** Work with Chris and the team at [Aloa](https://aloa.co) — consulting and development for AI-powered products.
 
 ## Background
 
@@ -82,4 +84,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 Vibe Security is available under the MIT License. See [LICENSE](LICENSE) for details.
 
-Created by [Chris Raroque](https://www.youtube.com/@raroque) ([@raroque](https://twitter.com/raroque)).
+Created by [Chris Raroque](https://www.youtube.com/@raroque) ([@raroque](https://twitter.com/raroque)) and the team at [Aloa](https://aloa.co).
