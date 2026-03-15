@@ -1,0 +1,21 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Debug
+firebase-debug.log
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Node
+node_modules/
