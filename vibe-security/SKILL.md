@@ -1,10 +1,11 @@
 ---
 name: vibe-security
-description: Audits codebases for common security vulnerabilities that AI coding assistants introduce in "vibe-coded" applications. Checks for exposed API keys, broken access control (Supabase RLS, Firebase rules), missing auth validation, client-side trust issues, insecure payment flows, and more. Use this skill whenever the user asks about security, wants a code review, mentions "vibe coding", or when you're writing or reviewing code that handles authentication, payments, database access, API keys, secrets, or user data — even if they don't explicitly mention security. Also trigger when the user says things like "is this safe?", "check my code", "audit this", "review for vulnerabilities", or "can someone hack this?".
+description: Audits codebases for common security vulnerabilities that AI coding assistants introduce in "vibe-coded" applications. Checks for exposed API keys, broken access control (Supabase RLS, Firebase rules), missing auth validation, client-side trust issues, insecure payment flows, dependency supply chain risks (slopsquatting), and more. Use this skill whenever the user asks about security, wants a code review, mentions "vibe coding", or when you're writing or reviewing code that handles authentication, payments, database access, API keys, secrets, or user data — even if they don't explicitly mention security. Also trigger when the user says things like "is this safe?", "check my code", "audit this", "review for vulnerabilities", or "can someone hack this?".
 license: MIT
 metadata:
-  author: Chris Raroque
-  version: "1.0"
+  author: Chris Raroque (original), improved by Fernando/Arti
+  version: "2.0"
+  updated: "2026-03"
 ---
 
 Audit code for security vulnerabilities commonly introduced by AI code generation. These issues are prevalent in "vibe-coded" apps — projects built rapidly with AI assistance where security fundamentals get skipped.
@@ -21,23 +22,27 @@ Never trust the client. Every price, user ID, role, subscription status, feature
 
 Examine the codebase systematically. For each step, load the relevant reference file only if the codebase uses that technology or pattern. Skip steps that aren't relevant.
 
-1. **Secrets & Environment Variables** — Scan for hardcoded API keys, tokens, or credentials. Check for secrets exposed via client-side env var prefixes (`NEXT_PUBLIC_`, `VITE_`, `EXPO_PUBLIC_`). Verify `.env` is in `.gitignore`. See `references/secrets-and-env.md`.
+1. **Framework Version Check** — Check `package.json` or lock files for known vulnerable framework versions (Next.js, React, etc.). Cross-reference with known critical CVEs. See `references/framework-versions.md`.
 
-2. **Database Access Control** — Check Supabase RLS policies, Firebase Security Rules, or Convex auth guards. This is the #1 source of critical vulnerabilities in vibe-coded apps. See `references/database-security.md`.
+2. **Secrets & Environment Variables** — Scan for hardcoded API keys, tokens, credentials, and common AI-generated default credentials. Check for secrets exposed via client-side env var prefixes (`NEXT_PUBLIC_`, `VITE_`, `EXPO_PUBLIC_`). Verify `.env` is in `.gitignore`. See `references/secrets-and-env.md`.
 
-3. **Authentication & Authorization** — Validate JWT handling, middleware auth, Server Action protection, and session management. See `references/authentication.md`.
+3. **Database Access Control** — Check Supabase RLS policies, Firebase Security Rules, or Convex auth guards. This is the #1 source of critical vulnerabilities in vibe-coded apps. See `references/database-security.md`.
 
-4. **Rate Limiting & Abuse Prevention** — Ensure auth endpoints, AI calls, and expensive operations have rate limits. Verify rate limit counters can't be tampered with. See `references/rate-limiting.md`.
+4. **Authentication & Authorization** — Validate JWT handling, middleware auth (never the sole auth layer), Server Action protection, and session management. See `references/authentication.md`.
 
-5. **Payment Security** — Check for client-side price manipulation, webhook signature verification, and subscription status validation. See `references/payments.md`.
+5. **Rate Limiting & Abuse Prevention** — Ensure auth endpoints, AI calls, and expensive operations have rate limits. Verify rate limit counters can't be tampered with. See `references/rate-limiting.md`.
 
-6. **Mobile Security** — Verify secure token storage, API key protection via backend proxy, and deep link validation. See `references/mobile.md`.
+6. **Payment Security** — Check for client-side price manipulation, webhook signature verification, and subscription status validation. See `references/payments.md`.
 
-7. **AI / LLM Integration** — Check for exposed AI API keys, missing usage caps, prompt injection vectors, and unsafe output rendering. See `references/ai-integration.md`.
+7. **Supply Chain & Dependencies** — Audit `package.json` for hallucinated packages, unpinned versions, and known vulnerabilities. AI assistants frequently introduce phantom dependencies. See `references/supply-chain.md`.
 
-8. **Deployment Configuration** — Verify production settings, security headers, source map exposure, and environment separation. See `references/deployment.md`.
+8. **Mobile Security** — Verify secure token storage, API key protection via backend proxy, and deep link validation. See `references/mobile.md`.
 
-9. **Data Access & Input Validation** — Check for SQL injection, ORM misuse, and missing input validation. See `references/data-access.md`.
+9. **AI / LLM Integration** — Check for exposed AI API keys, missing usage caps, prompt injection vectors, and unsafe output rendering. See `references/ai-integration.md`.
+
+10. **Deployment Configuration** — Verify production settings, security headers, source map exposure, preview deployment isolation, and environment separation. See `references/deployment.md`.
+
+11. **Data Access & Input Validation** — Check for SQL injection, ORM misuse, and missing input validation. See `references/data-access.md`.
 
 If doing a partial review or generating code in a specific area, load only the relevant reference files.
 
@@ -48,7 +53,8 @@ If doing a partial review or generating code in a specific area, load only the r
 - When multiple issues exist, prioritize by exploitability and real-world impact.
 - If the codebase doesn't use a particular technology (e.g., no Supabase), skip that section entirely.
 - When generating new code, consult the relevant reference files proactively to avoid introducing vulnerabilities in the first place.
-- If you find a critical issue (exposed secrets, disabled RLS, auth bypass), flag it immediately at the top of your response — don't bury it in a long list.
+- If you find a critical issue (exposed secrets, disabled RLS, auth bypass, vulnerable framework version), flag it immediately at the top of your response — don't bury it in a long list.
+- After the audit, recommend specific automated tools the developer should run. See `references/tooling.md`.
 
 
 ## Output Format
@@ -61,7 +67,7 @@ For each issue:
 3. Explain what an attacker could do (concrete impact, not abstract risk).
 4. Show a before/after code fix.
 
-Skip areas with no issues. End with a prioritized summary.
+Skip areas with no issues. End with a prioritized summary and a "Next Steps" section with specific automated tools to run.
 
 ### Example Output
 
@@ -81,6 +87,20 @@ const supabase = createClient(url, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
 
 #### High
 
+**`package.json` — next@15.1.0 vulnerable to CVE-2025-66478 (React2Shell, CVSS 10.0)**
+
+This version of Next.js contains a critical Remote Code Execution vulnerability in React Server Components. An attacker can craft requests that trigger unintended server execution paths.
+
+```json
+// Before
+"next": "15.1.0"
+
+// After — upgrade to patched version
+"next": "15.1.9"
+```
+
+#### High
+
 **`app/api/checkout/route.ts:15` — Price taken from client request body**
 
 An attacker can set any price (including $0.01) by modifying the request. Prices must be looked up server-side.
@@ -94,14 +114,23 @@ const session = await stripe.checkout.sessions.create({
 // After — look up the price server-side
 const product = await db.products.findUnique({ where: { id: req.body.productId } })
 const session = await stripe.checkout.sessions.create({
-  line_items: [{ price: product.stripePriceId }]
+  line_items: [{ price: product.stripePriceId }],
 })
 ```
 
 ### Summary
 
 1. **Service role key exposed (Critical):** Anyone can bypass all database security. Rotate the key immediately and move it to server-side only.
-2. **Client-controlled pricing (High):** Attackers can purchase at any price. Use server-side price lookup.
+2. **Vulnerable Next.js version (High):** Upgrade to patched version immediately — RCE is exploitable remotely.
+3. **Client-controlled pricing (High):** Attackers can purchase at any price. Use server-side price lookup.
+
+### Next Steps
+
+Run these automated checks:
+- `npx gitleaks detect` — scan git history for leaked secrets
+- `npm audit` — check dependencies for known vulnerabilities
+- Supabase Dashboard → Security Advisor — scan for RLS misconfigurations
+- Verify `.env` is in `.gitignore`: `git ls-files | grep -i env`
 
 
 ## When Generating Code
@@ -111,12 +140,15 @@ These rules also apply proactively. Before writing code that touches auth, payme
 
 ## References
 
-- `references/secrets-and-env.md` — API keys, tokens, environment variable configuration, and `.gitignore` rules.
-- `references/database-security.md` — Supabase RLS, Firebase Security Rules, and Convex auth patterns.
-- `references/authentication.md` — JWT verification, middleware, Server Actions, and session management.
+- `references/framework-versions.md` — Known critical CVEs for Next.js, React, and common frameworks. **(NEW in v2.0)**
+- `references/secrets-and-env.md` — API keys, tokens, environment variable configuration, `.gitignore` rules, and common AI-generated default credentials. **(Updated in v2.0)**
+- `references/database-security.md` — Supabase RLS (including new API key model), Firebase Security Rules, Convex, and Edge Functions security. **(Updated in v2.0)**
+- `references/authentication.md` — JWT verification, middleware (NOT a security boundary), Server Actions, session management, and passkeys. **(Updated in v2.0)**
 - `references/rate-limiting.md` — Rate limiting strategies and abuse prevention.
 - `references/payments.md` — Stripe security, webhook verification, and price validation.
+- `references/supply-chain.md` — Dependency auditing, slopsquatting, hallucinated packages, and lock file hygiene. **(NEW in v2.0)**
 - `references/mobile.md` — React Native and Expo security: secure storage, API proxy, deep links.
-- `references/ai-integration.md` — LLM API key protection, usage caps, prompt injection, and output sanitization.
-- `references/deployment.md` — Production configuration, security headers, and environment separation.
+- `references/ai-integration.md` — LLM API key protection, usage caps, prompt injection, MCP security, and output sanitization. **(Updated in v2.0)**
+- `references/deployment.md` — Production configuration, security headers, preview deployment isolation, and environment separation. **(Updated in v2.0)**
 - `references/data-access.md` — SQL injection prevention, ORM safety, and input validation.
+- `references/tooling.md` — Recommended automated security scanning tools. **(NEW in v2.0)**

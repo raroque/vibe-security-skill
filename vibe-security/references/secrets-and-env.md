@@ -45,3 +45,27 @@ When auditing, search for:
 - Strings matching common key patterns: `sk_live_`, `sk_test_`, `AKIA`, `ghp_`, `glpat-`, `xoxb-`, `Bearer `
 - `process.env.NEXT_PUBLIC_` or `import.meta.env.VITE_` referencing anything with "secret", "private", "service", or "key" in the name
 - Hardcoded URLs containing credentials (e.g., `postgresql://user:password@host`)
+
+## Common AI-Generated Default Credentials
+
+AI code generation tools consistently produce applications with hardcoded default credentials. These are functional in production and enable trivial account takeover.
+
+Search for these patterns in your codebase:
+```bash
+grep -rn "password123\|admin123\|@example\.com\|@test\.com\|@admin\.com\|changeme\|supersecret\|keyboard.cat\|your-secret-key" --include="*.ts" --include="*.js" --include="*.tsx" --include="*.sql" --include="*.env*"
+```
+
+Common offenders:
+- `user@example.com` / `password123` — login and seed data
+- `admin@admin.com` / `admin` — admin panels
+- JWT secrets: `"secret"`, `"jwt-secret"`, `"your-secret-key"`, `"supersecret"`, `"changeme"`
+
+If any of these are present in production code or seed data that runs in production, flag as **High** severity. See also `references/supply-chain.md` for the full list.
+
+## Supabase New Key Model (2025+)
+
+Supabase projects created after mid-2025 use a new API key model:
+- **Publishable keys** replace the old `anon` key — safe for client-side
+- **Secret keys** replace `service_role` — revocable and auto-detected by GitHub Secret Scanning
+
+If auditing a newer Supabase project, check for the new key format. The same principle applies: publishable keys go client-side, secret keys stay server-side only.

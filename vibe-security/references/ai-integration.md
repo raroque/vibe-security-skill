@@ -59,3 +59,35 @@ If your application gives an LLM access to tools (database queries, API calls, f
 - Use least-privilege access (read-only where possible)
 - Log all tool invocations for audit
 - Never let the LLM construct raw SQL or shell commands from user input
+
+## MCP (Model Context Protocol) Security
+
+MCP connectors give AI agents access to external services (Supabase, GitHub, Slack, etc.). This is powerful but creates new attack surfaces:
+
+### MCP + service_role = Bypassed RLS
+
+If your MCP connector uses the Supabase `service_role` key, the AI agent bypasses ALL Row-Level Security. A prompt injection — hidden in a code comment, README, or package description that the agent reads — can instruct the agent to exfiltrate data.
+
+**Mitigations:**
+- Never give MCP connectors `service_role` access to production databases
+- Use read-only database credentials for MCP connections where possible
+- Review every MCP operation before approving it (don't auto-approve)
+- Keep MCP connectors to the minimum set you actually need
+
+### Prompt Injection via MCP Inputs
+
+Content returned by MCP tools (e.g., file contents from GitHub, messages from Slack) can contain adversarial instructions. The AI agent may follow these instructions because it treats MCP tool results as trusted context.
+
+**Mitigations:**
+- Be aware that any content the agent reads could contain injections
+- Don't auto-execute code or commands suggested by content retrieved via MCP
+- Use separate MCP configurations for development and production
+
+## AI Billing Protection
+
+Beyond per-provider spending caps, implement application-level controls:
+
+- **Per-user token budgets** stored server-side (not in client-accessible tables)
+- **Request-level cost estimation** before making expensive API calls
+- **Circuit breakers** — if total API spend exceeds a threshold in a short window, halt all AI calls and alert
+- **Separate API keys** for development and production AI usage — a dev key leak shouldn't drain your production budget

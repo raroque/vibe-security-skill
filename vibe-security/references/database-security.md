@@ -144,6 +144,45 @@ Use custom claims (`request.auth.token.role`) instead of querying a users docume
 Must validate `contentType`, `size`, and path ownership. Without this, users can upload executables or store files in other users' paths.
 
 
+## Supabase Edge Functions
+
+Edge Functions run server-side and have access to secrets via `Deno.env.get()`. Security considerations:
+
+- **Always validate the JWT** in Edge Functions that receive user requests. The `Authorization` header contains the user's JWT — verify it, don't just trust it:
+  ```typescript
+  // Inside Edge Function
+  const authHeader = req.headers.get('Authorization')!;
+  const { data: { user }, error } = await supabase.auth.getUser(
+    authHeader.replace('Bearer ', '')
+  );
+  if (error || !user) return new Response('Unauthorized', { status: 401 });
+  ```
+
+- **Don't create admin clients in Edge Functions exposed to users** unless strictly necessary. If you must, never return raw results — filter them.
+
+- **CORS in Edge Functions** — AI assistants often generate Edge Functions with `Access-Control-Allow-Origin: '*'`. Restrict to your domain.
+
+### Supabase MCP Security
+
+If using the Supabase MCP connector with Claude Code or similar tools: the MCP connector may use the `service_role` key, which bypasses all RLS. A prompt injection in any file Claude reads (README, comments, package descriptions) could instruct Claude to exfiltrate data through the MCP connector. Mitigations:
+- Review all MCP operations before approving them
+- Use read-only database connections where possible
+- Never give MCP connectors write access to production databases
+
+### New API Key Model (2025+)
+
+Supabase introduced publishable keys and revocable secrets in 2025, replacing the old anon/service_role pattern:
+- **Publishable keys** are safe for client-side use (similar to old anon key)
+- **Secret keys** are revocable and should never be in client code
+- Leaked keys are now auto-revoked via GitHub Secret Scanning
+- Check Supabase Dashboard for the new key format if your project was created after mid-2025
+
+### GoTrue Auth Vulnerabilities
+
+Supabase uses GoTrue for authentication. Watch for:
+- **Open redirects in `redirectTo`** — always whitelist redirect URLs in Supabase Dashboard → Authentication → URL Configuration
+- **Email confirmation disabled** — AI assistants often disable email confirmation for convenience during development and forget to re-enable it
+
 ## Convex
 
 - Every public `query` and `mutation` must call `ctx.auth.getUserIdentity()` and handle the unauthenticated case.

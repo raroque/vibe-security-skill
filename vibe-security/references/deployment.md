@@ -18,6 +18,24 @@ Use separate environment variables for each environment in Vercel (or equivalent
 
 Preview deployments should **never** use production API keys, database credentials, or payment keys. A preview deployment is often accessible to anyone with the URL.
 
+### Preview Deployments Are Public by Default
+
+**This is a critical gap in vibe-coded projects on Vercel.** By default, every PR or branch push generates a preview URL that is publicly accessible. If preview deployments use production environment variables:
+
+- Production database is exposed via the preview app
+- Real Stripe keys process test payments against live accounts
+- AI API keys get burned through preview usage
+
+**Mitigations:**
+1. In Vercel Dashboard → Settings → Environment Variables, scope production secrets to "Production" only — never "Preview"
+2. Enable Vercel Deployment Protection (Settings → Deployment Protection) to require authentication for preview URLs
+3. Use separate Supabase projects or branches for preview environments
+4. Never share preview URLs publicly — treat them as semi-private
+
+### Check for Leaked Preview URLs
+
+Search Slack, email, and project management tools for Vercel preview URLs that may have been shared externally. Each one is a potential entry point if it uses production credentials.
+
 ## Security Headers
 
 Set these headers on all responses:
