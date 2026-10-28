@@ -45,6 +45,8 @@ const ratelimit = new Ratelimit({
 });
 
 export async function POST(request: Request) {
+  // Clients can send their own x-forwarded-for to dodge the limit. Rely on it only if your host
+  // overwrites it (Vercel does); otherwise use the header your host sets, e.g. cf-connecting-ip on Cloudflare.
   const ip = request.headers.get('x-forwarded-for') ?? '127.0.0.1';
   const { success } = await ratelimit.limit(ip);
   if (!success) {

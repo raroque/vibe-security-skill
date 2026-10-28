@@ -1,6 +1,6 @@
 ---
 name: vibe-security
-description: Audits codebases for common security vulnerabilities that AI coding assistants introduce in "vibe-coded" applications. Checks for exposed API keys, broken access control (Supabase RLS, Firebase rules), missing auth validation, client-side trust issues, insecure payment flows, and more. Use this skill whenever the user asks about security, wants a code review, mentions "vibe coding", or when you're writing or reviewing code that handles authentication, payments, database access, API keys, secrets, or user data — even if they don't explicitly mention security. Also trigger when the user says things like "is this safe?", "check my code", "audit this", "review for vulnerabilities", or "can someone hack this?".
+description: Audits codebases for common security vulnerabilities that AI coding assistants introduce in "vibe-coded" applications. Checks for exposed API keys, broken access control (Supabase RLS, Firebase rules), missing auth validation, client-side trust issues, insecure payment flows, and more. Use this skill whenever the user asks about security or a security review, mentions "vibe coding", or when you're writing or reviewing code that handles authentication, payments, database access, API keys, secrets, or user data — even if they don't explicitly mention security. Also trigger when the user says things like "is this safe?", "check my code for security issues", "audit this", "review for vulnerabilities", or "can someone hack this?".
 license: MIT
 metadata:
   author: Chris Raroque
@@ -38,6 +38,8 @@ Examine the codebase systematically. For each step, load the relevant reference 
 8. **Deployment Configuration** — Verify production settings, security headers, source map exposure, and environment separation. See `references/deployment.md`.
 
 9. **Data Access & Input Validation** — Check for SQL injection, ORM misuse, and missing input validation. See `references/data-access.md`.
+
+10. **Dependencies** — AI assistants suggest packages that don't exist, which attackers then register ("slopsquatting"), or lookalikes of popular ones. Check that each dependency is a real, maintained package with the intended name, that a lockfile is committed, and run the ecosystem's audit (`npm audit`, `pip-audit`, `bundle audit`, `cargo audit`) for known vulnerabilities.
 
 If doing a partial review or generating code in a specific area, load only the relevant reference files.
 
